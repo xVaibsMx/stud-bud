@@ -14,17 +14,21 @@ app.use(express.json())
 app.use(cors())
 
 const isUserLoggedIn = (req, res, next) => {
-  const { username, password } = req.headers
-  const User = Users.find(
-    (user) => user.username === username && user.password === password
-  )
-  if (User) {
-    req.user = User
+  const authHeader = req.headers.authorization
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).send({ message: 'Authorization token missing' })
+  }
+
+  const token = authHeader.split(' ')[1]
+  try {
+    const decoded = jwt.verify(token, process.env.SECRET)
+    req.user = decoded.username
     next()
-  } else {
-    res.send('Incorrect username or password')
+  } catch (err) {
+    res.status(401).send({ message: 'Invalid token' })
   }
 }
+
 const userSchema = new mongoose.Schema({
   username: String,
   password: String,
@@ -71,7 +75,9 @@ app.post('/login', async (req, res) => {
   res.status(200).send({ message: 'User logged in successfully!', token })
 })
 
-app.get('/me', isUserLoggedIn, (req, res) => {})
+app.get('/me', isUserLoggedIn, (req, res) => {
+  res.status(200).send({ username: req.user })
+})
 app.listen(Port, () => {
   console.log(`Server running on port ${Port}`)
 })

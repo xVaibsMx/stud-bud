@@ -3,54 +3,77 @@ import React, { useState } from 'react'
 const Register = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const handleSubmit = () => {
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+
     fetch('http://localhost:3000/register', {
       method: 'POST',
-      body: JSON.stringify({
-        username,
-        password,
-      }),
+      body: JSON.stringify({ username, password }),
       headers: {
         'Content-Type': 'application/json',
       },
     })
-      .then((res) => {
-        return res.json()
-      })
-      .then((data) => {
-        window.alert(data.message)
+      .then(async (res) => {
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.message || 'Something went wrong')
         localStorage.setItem('token', data.token)
+        window.alert(data.message || 'Registration successful!')
+        window.location = '/dashboard'
+      })
+      .catch((err) => {
+        setError(err.message)
+      })
+      .finally(() => {
+        setLoading(false)
       })
   }
+
   return (
     <form
-      className="max-w-md mx-auto mt-10 p-8 bg-[#1e293b] bg-opacity-70 rounded-2xl shadow-2xl backdrop-blur-md"
       onSubmit={handleSubmit}
+      className="max-w-md mx-auto mt-16 p-8 rounded-3xl bg-[#1e293b] text-white shadow-2xl backdrop-blur-md border border-[#334155]"
     >
-      <h2 className="text-3xl font-[Orbitron] text-[#38bdf8] mb-4">Register</h2>
+      <h2 className="text-4xl font-[Orbitron] text-[#38bdf8] mb-6 text-center">
+        Create Your Account
+      </h2>
+
       <input
         type="text"
-        placeholder="Username"
+        placeholder="Enter a unique username"
         required
-        onChange={(e) => {
-          setUsername(e.target.value)
-        }}
-        className="w-full mb-4 p-3 rounded-md bg-[#0f172a] text-white border border-[#334155] focus:outline-none focus:ring-2 focus:ring-[#38bdf8]"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        className="w-full mb-4 p-3 rounded-lg bg-[#0f172a] border border-[#334155] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#38bdf8]"
       />
+
       <input
         type="password"
-        placeholder="Pasword"
+        placeholder="Create a secure password"
         required
-        onChange={(e) => {
-          setPassword(e.target.value)
-        }}
-        className="w-full mb-4 p-3 rounded-md bg-[#0f172a] text-white border border-[#334155] focus:outline-none focus:ring-2 focus:ring-[#38bdf8]"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        className="w-full mb-4 p-3 rounded-lg bg-[#0f172a] border border-[#334155] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#38bdf8]"
       />
+
+      {error && (
+        <div className="mb-4 text-sm text-red-400 font-medium text-center">
+          ⚠️ {error}
+        </div>
+      )}
+
       <button
-        className="px-6 py-3 rounded-full bg-[#38bdf8] text-[#0f172a] font-[Orbitron]  hover:bg-[#0ea5e9] transition"
         type="submit"
+        disabled={loading}
+        className={`w-full py-3 rounded-full font-[Orbitron] text-[#0f172a] bg-[#38bdf8] transition ${
+          loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#0ea5e9]'
+        }`}
       >
-        Submit
+        {loading ? 'Registering...' : 'Register'}
       </button>
     </form>
   )
