@@ -23,11 +23,15 @@ const Register = () => {
       })
   }
   return (
-    <div className="max-w-md mx-auto mt-10 p-8 bg-[#1e293b] bg-opacity-70 rounded-2xl shadow-2xl backdrop-blur-md">
+    <form
+      className="max-w-md mx-auto mt-10 p-8 bg-[#1e293b] bg-opacity-70 rounded-2xl shadow-2xl backdrop-blur-md"
+      onSubmit={handleSubmit}
+    >
       <h2 className="text-3xl font-[Orbitron] text-[#38bdf8] mb-4">Register</h2>
       <input
         type="text"
         placeholder="Username"
+        required
         onChange={(e) => {
           setUsername(e.target.value)
         }}
@@ -36,6 +40,7 @@ const Register = () => {
       <input
         type="password"
         placeholder="Pasword"
+        required
         onChange={(e) => {
           setPassword(e.target.value)
         }}
@@ -43,11 +48,11 @@ const Register = () => {
       />
       <button
         className="px-6 py-3 rounded-full bg-[#38bdf8] text-[#0f172a] font-[Orbitron]  hover:bg-[#0ea5e9] transition"
-        onClick={handleSubmit}
+        type="submit"
       >
         Submit
       </button>
-    </div>
+    </form>
   )
 }
 
