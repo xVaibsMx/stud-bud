@@ -36,7 +36,7 @@ const Dashboard = () => {
       {/* Card Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10 w-full max-w-4xl">
         {/* Card 1 */}
-        <div className="p-6 rounded-xl bg-gradient-to-br from-cyan-600 via-cyan-500 to-cyan-700/80 shadow-lg hover:shadow-cyan-400/30 transition duration-300">
+        <div className="p-6 rounded-xl bg-gradient-to-br from-indigo-600 via-indigo-500 to-indigo-700/80 shadow-lg hover:shadow-indigo-400/30 transition duration-300">
           <div className="flex gap-4 items-center">
             <Brain className="w-10 h-10 text-white" />
             <div>
@@ -49,7 +49,7 @@ const Dashboard = () => {
         </div>
 
         {/* Card 2 */}
-        <div className="p-6 rounded-xl bg-gradient-to-br from-pink-600 via-pink-500 to-pink-700/80 shadow-lg hover:shadow-pink-400/30 transition duration-300">
+        <div className="p-6 rounded-xl bg-gradient-to-br from-blue-600 via-blue-500 to-blue-700/80 shadow-lg hover:shadow-blue-400/30 transition duration-300">
           <div className="flex gap-4 items-center">
             <Clock className="w-10 h-10 text-white" />
             <div>
@@ -62,7 +62,7 @@ const Dashboard = () => {
         </div>
 
         {/* Card 3 */}
-        <div className="p-6 rounded-xl bg-gradient-to-br from-yellow-500 via-yellow-400 to-yellow-600/80 shadow-lg hover:shadow-yellow-300/30 transition duration-300">
+        <div className="p-6 rounded-xl bg-gradient-to-br from-purple-600 via-purple-500 to-purple-700/80 shadow-lg hover:shadow-purple-400/30 transition duration-300">
           <div className="flex gap-4 items-center">
             <HelpCircle className="w-10 h-10 text-white" />
             <div>
@@ -73,7 +73,7 @@ const Dashboard = () => {
         </div>
 
         {/* Card 4 */}
-        <div className="p-6 rounded-xl bg-gradient-to-br from-green-500 via-green-400 to-green-600/80 shadow-lg hover:shadow-green-300/30 transition duration-300">
+        <div className="p-6 rounded-xl bg-gradient-to-br from-violet-600 via-violet-500 to-violet-700/80 shadow-lg hover:shadow-violet-400/30 transition duration-300">
           <div className="flex gap-4 items-center">
             <BarChart3 className="w-10 h-10 text-white" />
             <div>

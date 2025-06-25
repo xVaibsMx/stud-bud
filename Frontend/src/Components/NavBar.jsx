@@ -32,10 +32,10 @@ const NavBar = () => {
   }
 
   return (
-    <nav className="flex justify-between items-center px-8 py-3 bg-[#0f172a]/90 backdrop-blur-md border-b border-[#1e293b] shadow-md shadow-cyan-500/10 w-full z-50">
+    <nav className="flex justify-between items-center px-8 py-3 bg-[#0f172a]/90 backdrop-blur-md border-b border-indigo-400/30 shadow-md shadow-blue-300/10 w-full z-50">
       {/* Logo */}
       <div
-        className="w-[240px] cursor-pointer flex items-center"
+        className="w-[250px] cursor-pointer flex items-center"
         onClick={() => navigate('/')}
       >
         <svg
@@ -44,14 +44,12 @@ const NavBar = () => {
           className="w-full h-auto"
         >
           <defs>
-            {/* <!-- Gradient for stroke and text --> */}
             <linearGradient id="textGradient" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="#06b6d4" />
-              <stop offset="100%" stopColor="#ec4899" />
+              <stop offset="0%" stopColor="#6366f1" />
+              <stop offset="100%" stopColor="#a855f7" />
             </linearGradient>
           </defs>
 
-          {/* <!-- Robot Icon (bigger, brighter) --> */}
           <g>
             <rect
               x="10"
@@ -59,16 +57,15 @@ const NavBar = () => {
               width="60"
               height="60"
               rx="14"
-              fill="#0f172a"
+              fill="#1e293b"
               stroke="url(#textGradient)"
               strokeWidth="3.5"
             />
-            <circle cx="28" cy="40" r="6" fill="#06b6d4" />
-            <circle cx="52" cy="40" r="6" fill="#ec4899" />
-            <rect x="28" y="56" width="24" height="5" rx="2.5" fill="#f1f5f9" />
+            <circle cx="28" cy="40" r="6" fill="#6366f1" />
+            <circle cx="52" cy="40" r="6" fill="#a855f7" />
+            <rect x="28" y="56" width="24" height="5" rx="2.5" fill="#e2e8f0" />
           </g>
 
-          {/* <!-- Logo Text --> */}
           <text
             x="85"
             y="60"
@@ -87,7 +84,7 @@ const NavBar = () => {
       <div className="flex gap-4">
         {user ? (
           <button
-            className="px-5 py-2 rounded-md bg-red-500/90 hover:bg-red-600 text-white font-[Orbitron] tracking-wide transition duration-300 shadow-md hover:shadow-red-500/30"
+            className="px-5 py-2 rounded-md bg-rose-600 text-white font-[Orbitron] tracking-wide transition duration-300 hover:bg-rose-700 shadow-md hover:shadow-rose-500/30"
             onClick={handleLogout}
           >
             Logout
@@ -95,13 +92,13 @@ const NavBar = () => {
         ) : (
           <>
             <button
-              className="px-5 py-2 rounded-md bg-gradient-to-r from-cyan-400 to-cyan-600 text-[#0f172a] font-[Orbitron] tracking-wide border border-cyan-500 hover:from-cyan-300 hover:to-cyan-500 transition duration-300 shadow-md hover:shadow-cyan-400/40"
+              className="px-5 py-2 rounded-md bg-gradient-to-r from-indigo-400 to-blue-500 text-white font-[Orbitron] tracking-wide hover:from-indigo-300 hover:to-blue-400 transition duration-300 shadow-md hover:shadow-indigo-400/40"
               onClick={() => navigate('/register')}
             >
               Register
             </button>
             <button
-              className="px-5 py-2 rounded-md bg-gradient-to-r from-pink-400 to-pink-600 text-[#0f172a] font-[Orbitron] tracking-wide border border-pink-500 hover:from-pink-300 hover:to-pink-500 transition duration-300 shadow-md hover:shadow-pink-400/40"
+              className="px-5 py-2 rounded-md bg-gradient-to-r from-purple-500 to-violet-600 text-white font-[Orbitron] tracking-wide hover:from-purple-400 hover:to-violet-500 transition duration-300 shadow-md hover:shadow-violet-400/40"
               onClick={() => navigate('/login')}
             >
               Login

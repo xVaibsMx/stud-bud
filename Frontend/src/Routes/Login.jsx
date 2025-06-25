@@ -37,9 +37,9 @@ const Login = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-md mx-auto mt-16 p-8 rounded-3xl bg-[#1e293b] text-white shadow-2xl backdrop-blur-md border border-[#334155]"
+      className="max-w-md mx-auto mt-16 p-8 rounded-3xl bg-[#1e293b] text-white shadow-2xl backdrop-blur-md border border-indigo-600/30"
     >
-      <h2 className="text-4xl font-[Orbitron] text-[#38bdf8] mb-6 text-center">
+      <h2 className="text-4xl font-[Orbitron] text-indigo-400 mb-6 text-center">
         Welcome Back
       </h2>
 
@@ -49,7 +49,7 @@ const Login = () => {
         value={username}
         onChange={(e) => setUsername(e.target.value)}
         required
-        className="w-full mb-4 p-3 rounded-lg bg-[#0f172a] border border-[#334155] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#38bdf8]"
+        className="w-full mb-4 p-3 rounded-lg bg-[#0f172a] border border-[#334155] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
       />
 
       <input
@@ -58,7 +58,7 @@ const Login = () => {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         required
-        className="w-full mb-4 p-3 rounded-lg bg-[#0f172a] border border-[#334155] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#38bdf8]"
+        className="w-full mb-4 p-3 rounded-lg bg-[#0f172a] border border-[#334155] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
       />
 
       {error && (
@@ -70,9 +70,11 @@ const Login = () => {
       <button
         type="submit"
         disabled={loading}
-        className={`w-full py-3 rounded-full font-[Orbitron] text-[#0f172a] bg-[#38bdf8] transition ${
-          loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#0ea5e9]'
-        }`}
+        className={`w-full py-3 rounded-full font-[Orbitron] text-white bg-gradient-to-r from-indigo-500 to-purple-600 transition ${
+          loading
+            ? 'opacity-50 cursor-not-allowed'
+            : 'hover:from-indigo-400 hover:to-purple-500'
+        } shadow-lg hover:shadow-indigo-500/30`}
       >
         {loading ? 'Logging in...' : 'Login'}
       </button>
