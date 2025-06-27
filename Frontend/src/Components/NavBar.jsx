@@ -27,8 +27,7 @@ const NavBar = () => {
   const handleLogout = () => {
     localStorage.removeItem('token')
     setUser('')
-    navigate('/login')
-    window.location.reload()
+    window.location = '/'
   }
 
   return (

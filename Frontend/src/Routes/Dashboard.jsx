@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { Brain, Clock, HelpCircle, BarChart3 } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 const Dashboard = () => {
   const [username, setUsername] = useState('')
+  const navigate = useNavigate()
 
   useEffect(() => {
     const token = localStorage.getItem('token')
@@ -36,7 +38,12 @@ const Dashboard = () => {
       {/* Card Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10 w-full max-w-4xl">
         {/* Card 1 */}
-        <div className="p-6 rounded-xl bg-gradient-to-br from-indigo-600 via-indigo-500 to-indigo-700/80 shadow-lg hover:shadow-indigo-400/30 transition duration-300">
+        <div
+          className="p-6 rounded-xl bg-gradient-to-br from-indigo-600 via-indigo-500 to-indigo-700/80 shadow-lg hover:shadow-indigo-400/30 transition duration-300"
+          onClick={() => {
+            navigate('/explain')
+          }}
+        >
           <div className="flex gap-4 items-center">
             <Brain className="w-10 h-10 text-white" />
             <div>
