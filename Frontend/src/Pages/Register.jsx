@@ -1,46 +1,53 @@
 import React, { useState } from 'react'
-import { data, Link } from 'react-router-dom' // Import Link from react-router-dom
+import { Link, useNavigate } from 'react-router-dom'
 
 const Register = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const navigate = useNavigate()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    console.log('Registering user:', { username, password })
-    fetch('http://localhost:3000/register', {
-      method: 'POST',
-      body: JSON.stringify({
-        username,
-        password,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((res) => {
-        return res.json()
+    setError('')
+
+    try {
+      const response = await fetch('http://localhost:5000/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
       })
-      .then((data) => {
-        console.log(data)
-      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setError(data.message || 'Something went wrong')
+        return
+      }
+
+      localStorage.setItem('token', data.token)
+      window.location = '/dashboard'
+    } catch (err) {
+      setError('Failed to connect to the server')
+    }
   }
 
   return (
-    <div className="flex justify-center px-4 py-10">
+    <div className="flex justify-center items-start px-4 py-20 bg-slate-900 min-h-[calc(100vh-64px)]">
       <form
         onSubmit={handleSubmit}
-        className="bg-[#1e293b] p-8 rounded-xl shadow-lg w-full max-w-md"
+        className="bg-[#1e293b] w-full max-w-md p-8 rounded-xl shadow-lg"
       >
         <h2 className="text-3xl font-semibold mb-6 text-teal-400 text-center">
           Create Your Account
         </h2>
 
+        {error && (
+          <p className="text-red-400 mb-4 text-sm text-center">{error}</p>
+        )}
+
         <div className="mb-4">
-          <label
-            htmlFor="username"
-            className="block text-lg font-medium mb-1 text-slate-300"
-          >
+          <label htmlFor="username" className="block text-slate-300 mb-1">
             Username
           </label>
           <input
@@ -48,17 +55,14 @@ const Register = () => {
             id="username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="w-full p-3 rounded-lg border border-gray-600 bg-[#15212b] text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-400"
+            className="w-full p-3 rounded-md border border-gray-600 bg-[#15212b] text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-400"
             placeholder="Enter your username"
             required
           />
         </div>
 
         <div className="mb-6">
-          <label
-            htmlFor="password"
-            className="block text-lg font-medium mb-1 text-slate-300"
-          >
+          <label htmlFor="password" className="block text-slate-300 mb-1">
             Password
           </label>
           <input
@@ -66,7 +70,7 @@ const Register = () => {
             id="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-3 rounded-lg border border-gray-600 bg-[#15212b] text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-400"
+            className="w-full p-3 rounded-md border border-gray-600 bg-[#15212b] text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-400"
             placeholder="Enter your password"
             required
           />
@@ -79,15 +83,12 @@ const Register = () => {
           Register
         </button>
 
-        {/* Login option */}
-        <div className="mt-4 text-center text-sm text-slate-300">
-          <p>
-            Already have an account?{' '}
-            <Link to="/login" className="text-teal-400 hover:underline">
-              Login here
-            </Link>
-          </p>
-        </div>
+        <p className="mt-4 text-center text-sm text-slate-300">
+          Already have an account?{' '}
+          <Link to="/login" className="text-teal-400 hover:underline">
+            Login here
+          </Link>
+        </p>
       </form>
     </div>
   )

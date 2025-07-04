@@ -4,6 +4,7 @@ import Landing from './Pages/Landing'
 import NavBar from './Components/NavBar'
 import Register from './Pages/Register'
 import Login from './Pages/Login.jsx'
+import Dashboard from './Pages/Dashboard.jsx'
 function App() {
   return (
     <>
@@ -13,6 +14,7 @@ function App() {
           <Route path="/" element={<Landing />}></Route>
           <Route path="/register" element={<Register />}></Route>
           <Route path="/login" element={<Login />}></Route>
+          <Route path="/dashboard" element={<Dashboard />}></Route>
         </Routes>
       </Router>
     </>

@@ -1,11 +1,73 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import axios from 'axios'
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false)
+  const [user, setUser] = useState(null)
+  const navigate = useNavigate()
 
-  // Close mobile menu when navigating
+  // Fetch user info on mount
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const token = localStorage.getItem('token')
+        if (!token) return
+
+        const res = await axios.get('http://localhost:5000/me', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        setUser(res.data.user)
+      } catch (err) {
+        console.log('User not logged in')
+        setUser(null)
+      }
+    }
+
+    fetchUser()
+  }, [])
+
   const handleLinkClick = () => setIsOpen(false)
+
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    setUser(null)
+    navigate('/login')
+  }
+
+  const renderLinks = () => {
+    if (user) {
+      return (
+        <button
+          onClick={handleLogout}
+          className="bg-red-500 px-5 py-2 rounded-full font-semibold text-white hover:bg-red-600 transition"
+        >
+          Logout
+        </button>
+      )
+    } else {
+      return (
+        <>
+          <Link
+            to="/register"
+            onClick={handleLinkClick}
+            className="text-teal-400 border border-teal-400 px-5 py-2 rounded-full font-semibold hover:bg-teal-400 hover:text-gray-900 transition"
+          >
+            Register
+          </Link>
+          <Link
+            to="/login"
+            onClick={handleLinkClick}
+            className="bg-teal-400 px-5 py-2 rounded-full font-semibold text-gray-900 hover:bg-teal-500 transition"
+          >
+            Login
+          </Link>
+        </>
+      )
+    }
+  }
 
   return (
     <nav className="w-full max-w-6xl mx-auto sticky top-0 bg-[#15203d]/90 backdrop-blur-sm z-50 rounded-b-xl px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
@@ -15,25 +77,10 @@ const NavBar = () => {
         </h1>
       </Link>
 
-      {/* Desktop navigation */}
-      <div className="hidden sm:flex space-x-6">
-        <Link
-          to="/register"
-          onClick={handleLinkClick}
-          className="text-teal-400 border border-teal-400 px-5 py-2 rounded-full font-semibold hover:bg-teal-400 hover:text-gray-900 transition"
-        >
-          Register
-        </Link>
-        <Link
-          to="/login"
-          onClick={handleLinkClick}
-          className="bg-teal-400 px-5 py-2 rounded-full font-semibold text-gray-900 hover:bg-teal-500 transition"
-        >
-          Login
-        </Link>
-      </div>
+      {/* Desktop */}
+      <div className="hidden sm:flex space-x-6">{renderLinks()}</div>
 
-      {/* Mobile menu toggle button */}
+      {/* Mobile Toggle */}
       <button
         aria-label="Toggle menu"
         aria-expanded={isOpen}
@@ -64,23 +111,37 @@ const NavBar = () => {
         </svg>
       </button>
 
-      {/* Mobile menu */}
+      {/* Mobile Menu */}
       {isOpen && (
         <div className="sm:hidden absolute top-full left-0 w-full max-w-6xl bg-[#15203d]/90 backdrop-blur-sm rounded-b-xl shadow-lg mt-1 px-6 py-5 z-40 flex flex-col space-y-4">
-          <Link
-            to="/register"
-            onClick={handleLinkClick}
-            className="text-teal-400 border border-teal-400 px-6 py-3 rounded-full font-semibold text-center hover:bg-teal-400 hover:text-gray-900 transition"
-          >
-            Register
-          </Link>
-          <Link
-            to="/login"
-            onClick={handleLinkClick}
-            className="bg-teal-400 px-6 py-3 rounded-full font-semibold text-gray-900 text-center hover:bg-teal-500 transition"
-          >
-            Login
-          </Link>
+          {user ? (
+            <button
+              onClick={() => {
+                handleLogout()
+                handleLinkClick()
+              }}
+              className="bg-red-500 px-6 py-3 rounded-full font-semibold text-white text-center hover:bg-red-600 transition"
+            >
+              Logout
+            </button>
+          ) : (
+            <>
+              <Link
+                to="/register"
+                onClick={handleLinkClick}
+                className="text-teal-400 border border-teal-400 px-6 py-3 rounded-full font-semibold text-center hover:bg-teal-400 hover:text-gray-900 transition"
+              >
+                Register
+              </Link>
+              <Link
+                to="/login"
+                onClick={handleLinkClick}
+                className="bg-teal-400 px-6 py-3 rounded-full font-semibold text-gray-900 text-center hover:bg-teal-500 transition"
+              >
+                Login
+              </Link>
+            </>
+          )}
         </div>
       )}
     </nav>
