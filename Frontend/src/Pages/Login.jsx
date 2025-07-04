@@ -1,0 +1,79 @@
+import React, { useState } from 'react'
+
+const Login = () => {
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    console.log('Logging in user:', { username, password })
+    // Add your login logic here (API call, validation, etc.)
+  }
+
+  return (
+    <div className="flex justify-center px-4 py-10">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-[#1e293b] p-8 rounded-xl shadow-lg w-full max-w-md"
+      >
+        <h2 className="text-3xl font-semibold mb-6 text-teal-400 text-center">
+          Login to Your Account
+        </h2>
+
+        <div className="mb-4">
+          <label
+            htmlFor="username"
+            className="block text-lg font-medium mb-1 text-slate-300"
+          >
+            Username
+          </label>
+          <input
+            type="text"
+            id="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className="w-full p-3 rounded-lg border border-gray-600 bg-[#15212b] text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-400"
+            placeholder="Enter your username"
+            required
+          />
+        </div>
+
+        <div className="mb-6">
+          <label
+            htmlFor="password"
+            className="block text-lg font-medium mb-1 text-slate-300"
+          >
+            Password
+          </label>
+          <input
+            type="password"
+            id="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full p-3 rounded-lg border border-gray-600 bg-[#15212b] text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-400"
+            placeholder="Enter your password"
+            required
+          />
+        </div>
+
+        <button
+          type="submit"
+          className="w-full py-3 bg-teal-400 text-gray-900 font-semibold rounded-full hover:bg-teal-500 transition duration-300"
+        >
+          Login
+        </button>
+
+        <div className="mt-4 text-center text-sm text-slate-300">
+          <p>
+            Don't have an account?{' '}
+            <a href="/register" className="text-teal-400 hover:underline">
+              Register here
+            </a>
+          </p>
+        </div>
+      </form>
+    </div>
+  )
+}
+
+export default Login
