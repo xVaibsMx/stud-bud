@@ -12,7 +12,12 @@ const app = express()
 const port = process.env.PORT
 
 app.use(express.json())
-app.use(cors())
+app.use(
+  cors({
+    origin: 'http://localhost:5173', // or your frontend origin
+    credentials: true,
+  })
+)
 
 const userSchema = mongoose.Schema({
   username: String,
@@ -50,7 +55,7 @@ app.post('/register', async (req, res) => {
     res.status(401).send({ message: 'Username already taken!!' })
   } else {
     const hashedPass = await bcrypt.hash(password, 10)
-    const token = jwt.sign(username, process.env.SECRET)
+    const token = jwt.sign({ username }, process.env.SECRET)
     const user = new Users({ username, password: hashedPass })
     await user.save()
     res
@@ -83,9 +88,9 @@ app.get('/me', isUserLogged, (req, res) => {
   res.send(user)
 })
 
-app.get('/elia5', isUserLogged, async (req, res) => {
+app.post('/elia5', isUserLogged, async (req, res) => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY })
-  const content = req.body.content
+  const { content } = req.body.content
   const prompt = 'Explain like I am 5:' + content
   console.log(prompt)
 

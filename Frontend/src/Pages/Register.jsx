@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom' // Import Link from react-router-dom
+import { data, Link } from 'react-router-dom' // Import Link from react-router-dom
 
 const Register = () => {
   const [username, setUsername] = useState('')
@@ -8,6 +8,22 @@ const Register = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
     console.log('Registering user:', { username, password })
+    fetch('http://localhost:3000/register', {
+      method: 'POST',
+      body: JSON.stringify({
+        username,
+        password,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res) => {
+        return res.json()
+      })
+      .then((data) => {
+        console.log(data)
+      })
   }
 
   return (

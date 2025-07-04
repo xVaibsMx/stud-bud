@@ -7,7 +7,22 @@ const Login = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
     console.log('Logging in user:', { username, password })
-    // Add your login logic here (API call, validation, etc.)
+    fetch('http://localhost:3000/login', {
+      method: 'POST',
+      body: JSON.stringify({
+        username,
+        password,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res) => {
+        return res.json()
+      })
+      .then((data) => {
+        console.log(data)
+      })
   }
 
   return (
