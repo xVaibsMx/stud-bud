@@ -40,12 +40,21 @@ const NavBar = () => {
   const renderLinks = () => {
     if (user) {
       return (
-        <button
-          onClick={handleLogout}
-          className="bg-red-500 px-5 py-2 rounded-full font-semibold text-white hover:bg-red-600 transition"
-        >
-          Logout
-        </button>
+        <>
+          <Link
+            to="/dashboard"
+            onClick={handleLinkClick}
+            className="text-teal-400 border border-teal-400 px-5 py-2 rounded-full font-semibold hover:bg-teal-400 hover:text-gray-900 transition"
+          >
+            Dashboard
+          </Link>
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 px-5 py-2 rounded-full font-semibold text-white hover:bg-red-600 transition"
+          >
+            Logout
+          </button>
+        </>
       )
     } else {
       return (
@@ -77,7 +86,7 @@ const NavBar = () => {
         </h1>
       </Link>
 
-      {/* Desktop */}
+      {/* Desktop Links */}
       <div className="hidden sm:flex space-x-6">{renderLinks()}</div>
 
       {/* Mobile Toggle */}
@@ -115,15 +124,24 @@ const NavBar = () => {
       {isOpen && (
         <div className="sm:hidden absolute top-full left-0 w-full max-w-6xl bg-[#15203d]/90 backdrop-blur-sm rounded-b-xl shadow-lg mt-1 px-6 py-5 z-40 flex flex-col space-y-4">
           {user ? (
-            <button
-              onClick={() => {
-                handleLogout()
-                handleLinkClick()
-              }}
-              className="bg-red-500 px-6 py-3 rounded-full font-semibold text-white text-center hover:bg-red-600 transition"
-            >
-              Logout
-            </button>
+            <>
+              <Link
+                to="/dashboard"
+                onClick={handleLinkClick}
+                className="text-teal-400 border border-teal-400 px-6 py-3 rounded-full font-semibold text-center hover:bg-teal-400 hover:text-gray-900 transition"
+              >
+                Dashboard
+              </Link>
+              <button
+                onClick={() => {
+                  handleLogout()
+                  handleLinkClick()
+                }}
+                className="bg-red-500 px-6 py-3 rounded-full font-semibold text-white text-center hover:bg-red-600 transition"
+              >
+                Logout
+              </button>
+            </>
           ) : (
             <>
               <Link

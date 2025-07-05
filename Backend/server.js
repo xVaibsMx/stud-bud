@@ -14,26 +14,25 @@ const port = process.env.PORT || 5000
 app.use(express.json())
 app.use(
   cors({
-    origin: 'http://localhost:5173', // Your frontend
+    origin: 'http://localhost:5173',
     credentials: true,
   })
 )
 
-// Mongoose connection
+// Connect to MongoDB
 mongoose
   .connect(process.env.MONGO_URL)
   .then(() => console.log('MongoDB connected ✅'))
   .catch((err) => console.log('MongoDB connection error ❌', err))
 
-// User schema
+// User schema and model
 const userSchema = mongoose.Schema({
   username: String,
   password: String,
 })
-
 const Users = mongoose.model('Users', userSchema)
 
-// Middleware for protected routes
+// Auth middleware
 const isUserLogged = (req, res, next) => {
   const authHeader = req.headers.authorization
   if (authHeader) {
@@ -52,8 +51,7 @@ const isUserLogged = (req, res, next) => {
   }
 }
 
-// =================== AUTH ROUTES ===================
-
+// Auth routes
 app.post('/register', async (req, res) => {
   const { username, password } = req.body
   const userExist = await Users.findOne({ username })
@@ -90,31 +88,32 @@ app.post('/login', async (req, res) => {
   res.status(200).send({ message: 'User logged in successfully!', token })
 })
 
-// =================== GEMINI AI ROUTES ===================
-
+// Gemini AI helper
 const getAIResponse = async (promptText) => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY })
-  const model = ai.getGenerativeModel({ model: 'gemini-2.5-flash' })
-
-  const result = await model.generateContent([
-    {
-      role: 'user',
-      parts: [{ text: promptText }],
-    },
-  ])
-
-  const response = await result.response
-  return await response.text()
+  try {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY })
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: promptText,
+    })
+    return response.text
+  } catch (err) {
+    console.error('❌ Error in getAIResponse:', err)
+    throw err
+  }
 }
 
+// AI routes
 app.post('/elia5', isUserLogged, async (req, res) => {
   const { content } = req.body
   const prompt = 'Explain like I am 5: ' + content
 
   try {
+    console.log('🧠 Prompt:', prompt)
     const text = await getAIResponse(prompt)
     res.send({ message: text })
   } catch (err) {
+    console.error('❌ AI Error:', err)
     res.status(500).send({ message: 'Error from AI service.' })
   }
 })
@@ -127,12 +126,12 @@ app.post('/revision', isUserLogged, async (req, res) => {
     const text = await getAIResponse(prompt)
     res.send({ message: text })
   } catch (err) {
+    console.error('❌ AI Error:', err)
     res.status(500).send({ message: 'Error from AI service.' })
   }
 })
 
-// =================== UTIL ROUTES ===================
-
+// Util routes
 app.get('/', (req, res) => {
   res.send('Stud-Bud backend is running ✅')
 })
@@ -141,8 +140,7 @@ app.get('/me', isUserLogged, (req, res) => {
   res.send({ user: req.user })
 })
 
-// =================== START SERVER ===================
-
+// Start server
 app.listen(port, () => {
   console.log(`Server running on port ${port} 🚀`)
 })

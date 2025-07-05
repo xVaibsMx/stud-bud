@@ -6,7 +6,13 @@ const Landing = () => {
   const navigate = useNavigate()
 
   const handleGetStarted = () => {
-    navigate('/register') // Navigate to the register page
+    const token = localStorage.getItem('token')
+    if (token) {
+      navigate('/dashboard')
+    } else {
+      alert('Please register or login first.')
+      navigate('/register')
+    }
   }
 
   return (
@@ -24,13 +30,14 @@ const Landing = () => {
         </p>
         <button
           className="bg-teal-400 hover:bg-teal-500 active:bg-teal-600 text-gray-900 font-semibold px-8 sm:px-10 py-3 sm:py-4 rounded-full shadow-lg transition duration-300"
-          onClick={handleGetStarted} // Navigate to register page
+          onClick={handleGetStarted}
         >
           Get Started
         </button>
       </section>
-      {/* Features Section */}
-      <Features /> {/* Render the Features Component */}
+
+      {/* Features */}
+      <Features />
     </main>
   )
 }
