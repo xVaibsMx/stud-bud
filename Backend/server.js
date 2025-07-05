@@ -51,7 +51,7 @@ const isUserLogged = (req, res, next) => {
   }
 }
 
-// Auth routes
+// Register route
 app.post('/register', async (req, res) => {
   const { username, password } = req.body
   const userExist = await Users.findOne({ username })
@@ -69,6 +69,7 @@ app.post('/register', async (req, res) => {
   res.status(201).send({ message: 'User registered successfully!', token })
 })
 
+// Login route
 app.post('/login', async (req, res) => {
   const { username, password } = req.body
   const userCheck = await Users.findOne({ username })
@@ -104,12 +105,13 @@ const getAIResponse = async (promptText) => {
 }
 
 // AI routes
+
+// 1. Explain Like I’m 5
 app.post('/elia5', isUserLogged, async (req, res) => {
   const { content } = req.body
   const prompt = 'Explain like I am 5: ' + content
 
   try {
-    console.log('🧠 Prompt:', prompt)
     const text = await getAIResponse(prompt)
     res.send({ message: text })
   } catch (err) {
@@ -118,9 +120,38 @@ app.post('/elia5', isUserLogged, async (req, res) => {
   }
 })
 
+// 2. One Minute Revision
 app.post('/revision', isUserLogged, async (req, res) => {
   const { content } = req.body
   const prompt = 'Give a quick revision: ' + content
+
+  try {
+    const text = await getAIResponse(prompt)
+    res.send({ message: text })
+  } catch (err) {
+    console.error('❌ AI Error:', err)
+    res.status(500).send({ message: 'Error from AI service.' })
+  }
+})
+
+// 3. Quiz Me
+app.post('/quiz', isUserLogged, async (req, res) => {
+  const { content } = req.body
+  const prompt = `Make a short quiz of 3 questions with answers for: ${content}`
+
+  try {
+    const text = await getAIResponse(prompt)
+    res.send({ message: text })
+  } catch (err) {
+    console.error('❌ AI Error:', err)
+    res.status(500).send({ message: 'Error from AI service.' })
+  }
+})
+
+// 4. Fun Fact
+app.post('/funfact', isUserLogged, async (req, res) => {
+  const { content } = req.body
+  const prompt = `Give a fun fact related to: ${content}`
 
   try {
     const text = await getAIResponse(prompt)
