@@ -11,29 +11,37 @@ dotenv.config()
 const app = express()
 const port = process.env.PORT || 5000
 
+// Middleware
 app.use(express.json())
+
+// ✅ Allow CORS for local + Vercel frontend
+const allowedOrigins = [
+  'http://localhost:5173', // Local dev
+  'https://stud-bud.vercel.app', // Old Vercel domain
+  'https://stud-bud-ai.vercel.app', // Current Vercel domain
+]
 
 app.use(
   cors({
-    origin: 'https://stud-bud-ai.vercel.app', // use your actual frontend domain
+    origin: allowedOrigins,
     credentials: true,
   })
 )
 
-// Connect to MongoDB
+// ✅ MongoDB connection
 mongoose
   .connect(process.env.MONGO_URL)
   .then(() => console.log('MongoDB connected ✅'))
   .catch((err) => console.log('MongoDB connection error ❌', err))
 
-// User schema and model
+// ✅ User model
 const userSchema = mongoose.Schema({
   username: String,
   password: String,
 })
 const Users = mongoose.model('Users', userSchema)
 
-// Auth middleware
+// ✅ Auth middleware
 const isUserLogged = (req, res, next) => {
   const authHeader = req.headers.authorization
   if (authHeader) {
@@ -52,7 +60,7 @@ const isUserLogged = (req, res, next) => {
   }
 }
 
-// Register route
+// ✅ Register
 app.post('/register', async (req, res) => {
   const { username, password } = req.body
   const userExist = await Users.findOne({ username })
@@ -66,11 +74,10 @@ app.post('/register', async (req, res) => {
   await user.save()
 
   const token = jwt.sign({ username }, process.env.SECRET, { expiresIn: '7d' })
-
   res.status(201).send({ message: 'User registered successfully!', token })
 })
 
-// Login route
+// ✅ Login
 app.post('/login', async (req, res) => {
   const { username, password } = req.body
   const userCheck = await Users.findOne({ username })
@@ -80,17 +87,15 @@ app.post('/login', async (req, res) => {
   }
 
   const passCheck = await bcrypt.compare(password, userCheck.password)
-
   if (!passCheck) {
     return res.status(401).send({ message: 'Incorrect password!' })
   }
 
   const token = jwt.sign({ username }, process.env.SECRET, { expiresIn: '7d' })
-
   res.status(200).send({ message: 'User logged in successfully!', token })
 })
 
-// Gemini AI helper
+// ✅ Gemini AI function
 const getAIResponse = async (promptText) => {
   try {
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY })
@@ -105,74 +110,65 @@ const getAIResponse = async (promptText) => {
   }
 }
 
-// AI routes
-
-// 1. Explain Like I’m 5
+// ✅ AI routes
 app.post('/elia5', isUserLogged, async (req, res) => {
   const { content } = req.body
   const prompt = 'Explain like I am 5: ' + content
-
   try {
     const text = await getAIResponse(prompt)
     res.send({ message: text })
   } catch (err) {
-    console.error('❌ AI Error:', err)
     res.status(500).send({ message: 'Error from AI service.' })
   }
 })
 
-// 2. One Minute Revision
 app.post('/revision', isUserLogged, async (req, res) => {
   const { content } = req.body
   const prompt = 'Give a quick revision: ' + content
-
   try {
     const text = await getAIResponse(prompt)
     res.send({ message: text })
   } catch (err) {
-    console.error('❌ AI Error:', err)
     res.status(500).send({ message: 'Error from AI service.' })
   }
 })
 
-// 3. Quiz Me
 app.post('/quiz', isUserLogged, async (req, res) => {
   const { content } = req.body
   const prompt = `Make a short quiz of 3 questions with answers for: ${content}`
-
   try {
     const text = await getAIResponse(prompt)
     res.send({ message: text })
   } catch (err) {
-    console.error('❌ AI Error:', err)
     res.status(500).send({ message: 'Error from AI service.' })
   }
 })
 
-// 4. Fun Fact
 app.post('/funfact', isUserLogged, async (req, res) => {
   const { content } = req.body
   const prompt = `Give a fun fact related to: ${content}`
-
   try {
     const text = await getAIResponse(prompt)
     res.send({ message: text })
   } catch (err) {
-    console.error('❌ AI Error:', err)
     res.status(500).send({ message: 'Error from AI service.' })
   }
 })
 
-// Util routes
+// ✅ Utility routes
 app.get('/', (req, res) => {
   res.send('Stud-Bud backend is running ✅')
+})
+
+app.get('/test', (req, res) => {
+  res.send({ message: 'API is alive 🚀' })
 })
 
 app.get('/me', isUserLogged, (req, res) => {
   res.send({ user: req.user })
 })
 
-// Start server
+// ✅ Start the server
 app.listen(port, () => {
   console.log(`Server running on port ${port} 🚀`)
 })
