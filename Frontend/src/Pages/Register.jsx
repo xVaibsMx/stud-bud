@@ -7,19 +7,20 @@ const Register = () => {
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
+  // Use environment variable for backend base URL
+  const backendUrl =
+    process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
 
     try {
-      const response = await fetch(
-        'https://stud-bud-backend.onrender.com/register',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password }),
-        }
-      )
+      const response = await fetch(`${backendUrl}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      })
 
       const data = await response.json()
 
@@ -29,7 +30,8 @@ const Register = () => {
       }
 
       localStorage.setItem('token', data.token)
-      window.location = '/dashboard'
+      // Use navigate instead of window.location for SPA routing
+      navigate('/dashboard')
     } catch (err) {
       setError('Failed to connect to the server')
     }

@@ -24,7 +24,7 @@ const Quiz = () => {
 
     try {
       const res = await axios.post(
-        'http://localhost:5000/quiz',
+        'https://stud-bud-backend.onrender.com/quiz', // <-- change this URL to your deployed backend URL
         { content: topic },
         {
           headers: {

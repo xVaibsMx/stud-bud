@@ -7,29 +7,29 @@ const Login = () => {
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
+  const backendUrl =
+    process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
 
     try {
-      const response = await fetch(
-        'https://stud-bud-backend.onrender.com/login',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password }),
-        }
-      )
+      const response = await fetch(`${backendUrl}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      })
 
-      const data = await res.json()
+      const data = await response.json()
 
-      if (!res.ok) {
+      if (!response.ok) {
         setError(data.message || 'Login failed')
         return
       }
 
       localStorage.setItem('token', data.token)
-      window.location = '/dashboard'
+      navigate('/dashboard')
     } catch (err) {
       setError('Server not responding. Please try again later.')
     }

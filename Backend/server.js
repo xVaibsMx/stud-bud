@@ -14,22 +14,29 @@ const port = process.env.PORT || 5000
 // Middleware
 app.use(express.json())
 
+// CORS setup - allow your deployed frontend domain(s) here
 app.use(cors())
 
-// ✅ MongoDB connection
+// MongoDB connection
 mongoose
-  .connect(process.env.MONGO_URL)
+  .connect(process.env.MONGO_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => console.log('MongoDB connected ✅'))
-  .catch((err) => console.log('MongoDB connection error ❌', err))
+  .catch((err) => {
+    console.error('MongoDB connection error ❌', err)
+    process.exit(1) // exit if DB connection fails
+  })
 
-// ✅ User model
+// User schema and model
 const userSchema = mongoose.Schema({
-  username: String,
-  password: String,
+  username: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
 })
 const Users = mongoose.model('Users', userSchema)
 
-// ✅ Auth middleware
+// Auth middleware
 const isUserLogged = (req, res, next) => {
   const authHeader = req.headers.authorization
   if (authHeader) {
@@ -48,42 +55,61 @@ const isUserLogged = (req, res, next) => {
   }
 }
 
-// ✅ Register
+// Register route
 app.post('/register', async (req, res) => {
-  const { username, password } = req.body
-  const userExist = await Users.findOne({ username })
+  try {
+    const { username, password } = req.body
+    if (!username || !password)
+      return res
+        .status(400)
+        .send({ message: 'Username and password required!' })
 
-  if (userExist) {
-    return res.status(409).send({ message: 'Username already taken!' })
+    const userExist = await Users.findOne({ username })
+    if (userExist)
+      return res.status(409).send({ message: 'Username already taken!' })
+
+    const hashedPass = await bcrypt.hash(password, 10)
+    const user = new Users({ username, password: hashedPass })
+    await user.save()
+
+    const token = jwt.sign({ username }, process.env.SECRET, {
+      expiresIn: '7d',
+    })
+    res.status(201).send({ message: 'User registered successfully!', token })
+  } catch (err) {
+    console.error('Register error:', err)
+    res.status(500).send({ message: 'Server error during registration.' })
   }
-
-  const hashedPass = await bcrypt.hash(password, 10)
-  const user = new Users({ username, password: hashedPass })
-  await user.save()
-
-  const token = jwt.sign({ username }, process.env.SECRET, { expiresIn: '7d' })
-  res.status(201).send({ message: 'User registered successfully!', token })
 })
 
-// ✅ Login
+// Login route
 app.post('/login', async (req, res) => {
-  const { username, password } = req.body
-  const userCheck = await Users.findOne({ username })
+  try {
+    const { username, password } = req.body
+    if (!username || !password)
+      return res
+        .status(400)
+        .send({ message: 'Username and password required!' })
 
-  if (!userCheck) {
-    return res.status(401).send({ message: 'Invalid username!' })
+    const userCheck = await Users.findOne({ username })
+    if (!userCheck)
+      return res.status(401).send({ message: 'Invalid username!' })
+
+    const passCheck = await bcrypt.compare(password, userCheck.password)
+    if (!passCheck)
+      return res.status(401).send({ message: 'Incorrect password!' })
+
+    const token = jwt.sign({ username }, process.env.SECRET, {
+      expiresIn: '7d',
+    })
+    res.status(200).send({ message: 'User logged in successfully!', token })
+  } catch (err) {
+    console.error('Login error:', err)
+    res.status(500).send({ message: 'Server error during login.' })
   }
-
-  const passCheck = await bcrypt.compare(password, userCheck.password)
-  if (!passCheck) {
-    return res.status(401).send({ message: 'Incorrect password!' })
-  }
-
-  const token = jwt.sign({ username }, process.env.SECRET, { expiresIn: '7d' })
-  res.status(200).send({ message: 'User logged in successfully!', token })
 })
 
-// ✅ Gemini AI function
+// Gemini AI helper
 const getAIResponse = async (promptText) => {
   try {
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY })
@@ -93,57 +119,39 @@ const getAIResponse = async (promptText) => {
     })
     return response.text
   } catch (err) {
-    console.error('❌ Error in getAIResponse:', err)
+    console.error('Error in getAIResponse:', err)
     throw err
   }
 }
 
-// ✅ AI routes
-app.post('/elia5', isUserLogged, async (req, res) => {
-  const { content } = req.body
-  const prompt = 'Explain like I am 5: ' + content
-  try {
-    const text = await getAIResponse(prompt)
-    res.send({ message: text })
-  } catch (err) {
-    res.status(500).send({ message: 'Error from AI service.' })
-  }
+// AI routes
+const aiRoutes = [
+  { path: '/elia5', prefix: 'Explain like I am 5: ' },
+  { path: '/revision', prefix: 'Give a quick revision: ' },
+  {
+    path: '/quiz',
+    prefix: 'Make a short quiz of 3 questions with answers for: ',
+  },
+  { path: '/funfact', prefix: 'Give a fun fact related to: ' },
+]
+
+aiRoutes.forEach(({ path, prefix }) => {
+  app.post(path, isUserLogged, async (req, res) => {
+    const { content } = req.body
+    if (!content)
+      return res.status(400).send({ message: 'Content is required for AI.' })
+
+    const prompt = prefix + content
+    try {
+      const text = await getAIResponse(prompt)
+      res.send({ message: text })
+    } catch (err) {
+      res.status(500).send({ message: 'Error from AI service.' })
+    }
+  })
 })
 
-app.post('/revision', isUserLogged, async (req, res) => {
-  const { content } = req.body
-  const prompt = 'Give a quick revision: ' + content
-  try {
-    const text = await getAIResponse(prompt)
-    res.send({ message: text })
-  } catch (err) {
-    res.status(500).send({ message: 'Error from AI service.' })
-  }
-})
-
-app.post('/quiz', isUserLogged, async (req, res) => {
-  const { content } = req.body
-  const prompt = `Make a short quiz of 3 questions with answers for: ${content}`
-  try {
-    const text = await getAIResponse(prompt)
-    res.send({ message: text })
-  } catch (err) {
-    res.status(500).send({ message: 'Error from AI service.' })
-  }
-})
-
-app.post('/funfact', isUserLogged, async (req, res) => {
-  const { content } = req.body
-  const prompt = `Give a fun fact related to: ${content}`
-  try {
-    const text = await getAIResponse(prompt)
-    res.send({ message: text })
-  } catch (err) {
-    res.status(500).send({ message: 'Error from AI service.' })
-  }
-})
-
-// ✅ Utility routes
+// Utility routes
 app.get('/', (req, res) => {
   res.send('Stud-Bud backend is running ✅')
 })
@@ -156,7 +164,7 @@ app.get('/me', isUserLogged, (req, res) => {
   res.send({ user: req.user })
 })
 
-// ✅ Start the server
+// Start server
 app.listen(port, () => {
   console.log(`Server running on port ${port} 🚀`)
 })

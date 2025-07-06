@@ -23,7 +23,7 @@ const Explain = () => {
       }
 
       const res = await axios.post(
-        'http://localhost:5000/elia5',
+        'https://stud-bud-backend.onrender.com/elia5', // <-- change to your deployed backend URL
         { content: topic },
         {
           headers: {
@@ -62,6 +62,7 @@ const Explain = () => {
             onClick={handleExplain}
             disabled={loading}
             className="px-8 py-3 rounded-lg bg-gradient-to-r from-teal-400 to-teal-500 text-gray-900 font-semibold hover:from-teal-500 hover:to-teal-600 transition disabled:opacity-50"
+            aria-busy={loading}
           >
             {loading ? 'Explaining...' : 'Explain'}
           </button>

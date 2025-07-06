@@ -59,6 +59,11 @@ const Dashboard = () => {
             key={index}
             onClick={() => handleFeatureClick(path)}
             className={`bg-slate-800 transition duration-300 rounded-2xl p-6 cursor-pointer shadow-md group ${shadow}`}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') handleFeatureClick(path)
+            }}
           >
             <div className="flex flex-col items-center text-center">
               {icon}
