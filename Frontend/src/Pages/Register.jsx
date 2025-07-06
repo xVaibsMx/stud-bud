@@ -29,6 +29,7 @@ const Register = () => {
       }
 
       localStorage.setItem('token', data.token)
+      window.dispatchEvent(new Event('storage')) // notify NavBar to update
       navigate('/dashboard')
     } catch (err) {
       setError('Failed to connect to the server')

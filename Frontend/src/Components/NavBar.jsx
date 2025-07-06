@@ -7,12 +7,11 @@ const NavBar = () => {
   const [user, setUser] = useState(null)
   const navigate = useNavigate()
 
-  // Fetch user info on mount
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const token = localStorage.getItem('token')
-        if (!token) return
+        if (!token) return setUser(null)
 
         const res = await axios.get(
           'https://stud-bud-backend.onrender.com/me',
@@ -30,6 +29,13 @@ const NavBar = () => {
     }
 
     fetchUser()
+
+    // 🔁 Listen for login/logout token updates
+    window.addEventListener('storage', fetchUser)
+
+    return () => {
+      window.removeEventListener('storage', fetchUser)
+    }
   }, [])
 
   const handleLinkClick = () => setIsOpen(false)
@@ -38,6 +44,9 @@ const NavBar = () => {
     localStorage.removeItem('token')
     setUser(null)
     navigate('/login')
+
+    // 📢 Notify other components about logout
+    window.dispatchEvent(new Event('storage'))
   }
 
   const renderLinks = () => {

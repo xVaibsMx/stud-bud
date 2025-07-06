@@ -29,6 +29,7 @@ const Login = () => {
       }
 
       localStorage.setItem('token', data.token)
+      window.dispatchEvent(new Event('storage')) // notify NavBar to update
       navigate('/dashboard')
     } catch (err) {
       setError('Server not responding. Please try again later.')
