@@ -7,6 +7,8 @@ const Explain = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'
+
   const handleExplain = async () => {
     if (!topic.trim()) return
 
@@ -23,7 +25,7 @@ const Explain = () => {
       }
 
       const res = await axios.post(
-        'https://stud-bud-backend.onrender.com/elia5', // <-- change to your deployed backend URL
+        `${backendUrl}/elia5`,
         { content: topic },
         {
           headers: {

@@ -7,8 +7,8 @@ const Login = () => {
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
-  const backendUrl =
-    process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'
+  // Use Vite environment variable here
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'
 
   const handleSubmit = async (e) => {
     e.preventDefault()

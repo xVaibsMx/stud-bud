@@ -7,9 +7,8 @@ const Register = () => {
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
-  // Use environment variable for backend base URL
-  const backendUrl =
-    process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'
+  // Use Vite env variable for backend base URL
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -30,7 +29,6 @@ const Register = () => {
       }
 
       localStorage.setItem('token', data.token)
-      // Use navigate instead of window.location for SPA routing
       navigate('/dashboard')
     } catch (err) {
       setError('Failed to connect to the server')

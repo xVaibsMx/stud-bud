@@ -14,11 +14,14 @@ const NavBar = () => {
         const token = localStorage.getItem('token')
         if (!token) return
 
-        axios.get('https://stud-bud-backend.onrender.com/me', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
+        const res = await axios.get(
+          'https://stud-bud-backend.onrender.com/me',
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
         setUser(res.data.user)
       } catch (err) {
         console.log('User not logged in')

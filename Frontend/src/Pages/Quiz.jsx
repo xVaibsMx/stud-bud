@@ -9,6 +9,8 @@ const Quiz = () => {
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'
+
   const handleQuiz = async () => {
     if (!topic.trim()) return
 
@@ -24,7 +26,7 @@ const Quiz = () => {
 
     try {
       const res = await axios.post(
-        'https://stud-bud-backend.onrender.com/quiz', // <-- change this URL to your deployed backend URL
+        `${backendUrl}/quiz`,
         { content: topic },
         {
           headers: {
