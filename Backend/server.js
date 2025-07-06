@@ -14,19 +14,7 @@ const port = process.env.PORT || 5000
 // Middleware
 app.use(express.json())
 
-// ✅ Allow CORS for local + Vercel frontend
-const allowedOrigins = [
-  'http://localhost:5173', // Local dev
-  'https://stud-bud.vercel.app', // Old Vercel domain
-  'https://stud-bud-ai.vercel.app', // Current Vercel domain
-]
-
-app.use(
-  cors({
-    origin: allowedOrigins,
-    credentials: true,
-  })
-)
+app.use(cors())
 
 // ✅ MongoDB connection
 mongoose
