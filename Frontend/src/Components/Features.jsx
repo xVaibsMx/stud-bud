@@ -42,7 +42,7 @@ const Features = () => {
       title: 'Quick Revision',
       description:
         'Refresh your knowledge in just one minute with concise, focused summaries.',
-      path: '/revise', // Not yet implemented
+      path: '/revision', // note backend route is /revision (you had /revise before)
     },
     {
       icon: (
@@ -61,30 +61,12 @@ const Features = () => {
         'Challenge yourself immediately with smart quizzes to check what you’ve learned.',
       path: '/quiz',
     },
-    {
-      icon: (
-        <svg
-          className="w-12 h-12 mb-5 text-pink-400"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2}
-          viewBox="0 0 24 24"
-        >
-          <path d="M4 6h16M4 12h8m-8 6h16" />
-        </svg>
-      ),
-      title: 'Progress Tracking',
-      description:
-        'Keep a clear history of your studies and see your progress over time.',
-      path: '/progress', // Not yet implemented
-    },
   ]
 
   const featureShadows = [
     'hover:shadow-teal-400/50',
     'hover:shadow-violet-400/50',
     'hover:shadow-cyan-400/50',
-    'hover:shadow-pink-400/50',
   ]
 
   const handleFeatureClick = (path) => {
@@ -98,7 +80,7 @@ const Features = () => {
   }
 
   return (
-    <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 w-full max-w-6xl mt-16">
+    <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl mt-16">
       {features.map(({ icon, title, description, path }, index) => (
         <article
           key={index}

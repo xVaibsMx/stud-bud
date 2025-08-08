@@ -11,7 +11,8 @@ const Quiz = () => {
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'
 
-  const handleQuiz = async () => {
+  const handleQuiz = async (e) => {
+    e.preventDefault()
     if (!topic.trim()) return
 
     const token = localStorage.getItem('token')
@@ -49,9 +50,12 @@ const Quiz = () => {
         })
 
       setQuiz(parsed)
+      setTopic('') // clear input after success
     } catch (err) {
       console.error('❌ Quiz Error:', err)
-      setError('Something went wrong. Please try again.')
+      const msg =
+        err.response?.data?.message || 'Something went wrong. Please try again.'
+      setError(msg)
     } finally {
       setLoading(false)
     }
@@ -60,27 +64,43 @@ const Quiz = () => {
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#0d162c] to-[#15203d] px-6 py-12 flex flex-col items-center">
       <section className="w-full max-w-3xl bg-[#1e2a4d] rounded-2xl p-8 shadow-lg">
-        <h2 className="text-4xl font-extrabold text-teal-400 mb-8 text-center select-none">
+        <h2
+          className="text-4xl font-extrabold text-teal-400 mb-8 text-center select-none"
+          tabIndex={-1}
+        >
           📝 Quiz Me
         </h2>
 
-        <div className="flex flex-col sm:flex-row gap-4">
+        <form
+          onSubmit={handleQuiz}
+          className="flex flex-col sm:flex-row gap-4"
+          aria-label="Quiz generation form"
+        >
+          <label htmlFor="quizTopic" className="sr-only">
+            Topic to generate quiz for
+          </label>
           <input
+            id="quizTopic"
             type="text"
             placeholder="Enter a topic (e.g., Newton's Laws)"
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
             className="flex-grow px-5 py-3 rounded-lg border border-teal-400 bg-[#0f1833] text-white placeholder-teal-300 focus:outline-none focus:ring-4 focus:ring-teal-500 transition"
             spellCheck={false}
+            autoComplete="off"
+            disabled={loading}
+            aria-required="true"
           />
           <button
-            onClick={handleQuiz}
-            disabled={loading}
-            className="px-8 py-3 rounded-lg bg-gradient-to-r from-teal-400 to-teal-500 text-gray-900 font-semibold hover:from-teal-500 hover:to-teal-600 transition disabled:opacity-50"
+            type="submit"
+            disabled={loading || !topic.trim()}
+            className="px-8 py-3 rounded-lg bg-gradient-to-r from-teal-400 to-teal-500 text-gray-900 font-semibold hover:from-teal-500 hover:to-teal-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-busy={loading}
+            aria-disabled={loading || !topic.trim()}
           >
             {loading ? 'Generating...' : 'Generate'}
           </button>
-        </div>
+        </form>
 
         {error && (
           <p
@@ -92,7 +112,11 @@ const Quiz = () => {
         )}
 
         {quiz.length > 0 && (
-          <article className="mt-10 bg-[#132544] text-white p-6 rounded-xl shadow-inner max-w-none whitespace-pre-wrap leading-relaxed">
+          <article
+            className="mt-10 bg-[#132544] text-white p-6 rounded-xl shadow-inner max-w-none whitespace-pre-wrap leading-relaxed"
+            tabIndex={0}
+            aria-live="polite"
+          >
             <h3 className="text-2xl font-bold mb-6 select-none">Your Quiz</h3>
             <ul className="space-y-6">
               {quiz.map((item, index) => (

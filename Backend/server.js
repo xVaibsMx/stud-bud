@@ -132,7 +132,7 @@ const aiRoutes = [
     path: '/quiz',
     prefix: 'Make a short quiz of 3 questions with answers for: ',
   },
-  { path: '/funfact', prefix: 'Give a fun fact related to: ' },
+  // Fun fact removed
 ]
 
 aiRoutes.forEach(({ path, prefix }) => {

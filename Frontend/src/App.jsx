@@ -7,6 +7,7 @@ import Login from './Pages/Login'
 import Dashboard from './Pages/Dashboard'
 import Explain from './Pages/Explain'
 import Quiz from './Pages/Quiz'
+import QuickRevision from './Pages/QuickRevision'
 
 function App() {
   return (
@@ -19,8 +20,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/explain" element={<Explain />} />
         <Route path="/quiz" element={<Quiz />} />
-        {/* Optional 404 route */}
-        {/* <Route path="*" element={<NotFound />} /> */}
+        <Route path="/revise" element={<QuickRevision />} />{' '}
       </Routes>
     </Router>
   )
