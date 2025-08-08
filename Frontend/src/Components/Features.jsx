@@ -42,7 +42,7 @@ const Features = () => {
       title: 'Quick Revision',
       description:
         'Refresh your knowledge in just one minute with concise, focused summaries.',
-      path: '/revision', // note backend route is /revision (you had /revise before)
+      path: '/revise', // note backend route is /revision (you had /revise before)
     },
     {
       icon: (
