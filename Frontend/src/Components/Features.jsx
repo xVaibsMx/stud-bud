@@ -8,7 +8,7 @@ const Features = () => {
     {
       icon: (
         <svg
-          className="w-12 h-12 mb-5 text-teal-400"
+          className="w-12 h-12 mb-6 text-teal-400"
           fill="none"
           stroke="currentColor"
           strokeWidth={2}
@@ -29,7 +29,7 @@ const Features = () => {
     {
       icon: (
         <svg
-          className="w-12 h-12 mb-5 text-violet-400"
+          className="w-12 h-12 mb-6 text-violet-400"
           fill="none"
           stroke="currentColor"
           strokeWidth={2}
@@ -42,12 +42,12 @@ const Features = () => {
       title: 'Quick Revision',
       description:
         'Refresh your knowledge in just one minute with concise, focused summaries.',
-      path: '/revise', // note backend route is /revision (you had /revise before)
+      path: '/revise',
     },
     {
       icon: (
         <svg
-          className="w-12 h-12 mb-5 text-cyan-400"
+          className="w-12 h-12 mb-6 text-cyan-400"
           fill="none"
           stroke="currentColor"
           strokeWidth={2}
@@ -64,9 +64,9 @@ const Features = () => {
   ]
 
   const featureShadows = [
-    'hover:shadow-teal-400/50',
-    'hover:shadow-violet-400/50',
-    'hover:shadow-cyan-400/50',
+    'hover:shadow-teal-400/40',
+    'hover:shadow-violet-400/40',
+    'hover:shadow-cyan-400/40',
   ]
 
   const handleFeatureClick = (path) => {
@@ -80,15 +80,23 @@ const Features = () => {
   }
 
   return (
-    <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl mt-16">
+    <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 w-full max-w-6xl mt-20">
       {features.map(({ icon, title, description, path }, index) => (
         <article
           key={index}
           onClick={() => handleFeatureClick(path)}
-          className={`bg-[#1e293b] rounded-xl p-6 sm:p-8 shadow-lg transition transform hover:-translate-y-1 cursor-pointer ${featureShadows[index]}`}
+          className={`bg-[#172036] rounded-2xl p-8 shadow-lg transition-all duration-300 transform hover:-translate-y-2 hover:scale-105 cursor-pointer ${featureShadows[index]}`}
+          style={{
+            fontFamily: 'Inter, sans-serif',
+          }}
         >
           {icon}
-          <h3 className="text-lg sm:text-xl font-semibold mb-2">{title}</h3>
+          <h3
+            className="text-xl font-semibold mb-3"
+            style={{ fontFamily: 'Poppins, sans-serif' }}
+          >
+            {title}
+          </h3>
           <p className="text-slate-300 text-sm leading-relaxed">
             {description}
           </p>

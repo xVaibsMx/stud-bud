@@ -21,28 +21,28 @@ const Dashboard = () => {
       title: 'Explain Like I’m 5',
       desc: 'Understand complex topics in simple terms.',
       path: '/explain',
-      shadow: 'hover:shadow-[0_0_20px_#14b8a6]',
+      shadow: 'hover:shadow-[0_0_25px_#14b8a6]',
     },
     {
       icon: <FaClock className="w-12 h-12 text-yellow-400 mb-4" />,
       title: '1-Minute Revision',
       desc: 'Quick recaps to boost retention.',
       path: '/revise',
-      shadow: 'hover:shadow-[0_0_20px_#facc15]',
+      shadow: 'hover:shadow-[0_0_25px_#facc15]',
     },
     {
       icon: <FaBrain className="w-12 h-12 text-pink-400 mb-4" />,
       title: 'Quiz Me',
       desc: 'Test yourself and stay sharp.',
       path: '/quiz',
-      shadow: 'hover:shadow-[0_0_20px_#f472b6]',
+      shadow: 'hover:shadow-[0_0_25px_#f472b6]',
     },
   ]
 
   return (
-    <main className="min-h-screen bg-slate-900 text-white px-6 sm:px-12 lg:px-24 py-12">
+    <main className="min-h-screen bg-gradient-to-br from-[#0b1120] via-[#0f172a] to-[#1e293b] text-white px-6 sm:px-12 lg:px-24 py-16">
       {/* Welcome Header */}
-      <section className="mb-16 text-center max-w-3xl mx-auto">
+      <section className="mb-20 text-center max-w-3xl mx-auto">
         <h1 className="text-4xl sm:text-5xl font-extrabold mb-4">
           Welcome back, <span className="text-teal-400">Learner!</span>
         </h1>
@@ -52,12 +52,12 @@ const Dashboard = () => {
       </section>
 
       {/* Feature Cards */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto mb-16">
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 max-w-6xl mx-auto mb-20">
         {features.map(({ icon, title, desc, path, shadow }, index) => (
           <div
             key={index}
             onClick={() => handleFeatureClick(path)}
-            className={`bg-slate-800 rounded-2xl p-8 cursor-pointer shadow-md group transition duration-300 ${shadow} flex flex-col items-center text-center`}
+            className={`bg-slate-800/80 backdrop-blur rounded-2xl p-10 cursor-pointer shadow-md group transition duration-300 hover:scale-[1.05] ${shadow} flex flex-col items-center text-center`}
             role="button"
             tabIndex={0}
             onKeyDown={(e) =>
@@ -76,11 +76,11 @@ const Dashboard = () => {
       </section>
 
       {/* Motivation Card */}
-      <section className="text-center bg-gradient-to-r from-teal-500 to-cyan-500 text-slate-900 p-8 rounded-2xl shadow-xl max-w-3xl mx-auto">
-        <h2 className="text-2xl sm:text-3xl font-bold mb-3">
+      <section className="text-center bg-slate-800/90 backdrop-blur rounded-2xl p-10 shadow-xl max-w-3xl mx-auto border border-slate-700">
+        <h2 className="text-2xl sm:text-3xl font-bold mb-3 text-teal-300">
           “Consistency is the key to mastery.”
         </h2>
-        <p className="text-sm sm:text-base">
+        <p className="text-slate-300 text-base">
           Keep going. Even 1% better every day adds up!
         </p>
       </section>
