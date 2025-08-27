@@ -5,17 +5,20 @@ import { BookOpen } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const NavBar = () => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [user, setUser] = useState(undefined) // undefined while loading
-  const [loadingUser, setLoadingUser] = useState(true)
   const navigate = useNavigate()
 
+  // Initial state based on token presence
+  const [user, setUser] = useState(() => {
+    const token = localStorage.getItem('token')
+    return token ? {} : null // empty object shows "loading" until validated
+  })
+  const [isOpen, setIsOpen] = useState(false)
+
+  // Fetch user from backend if token exists
   const fetchUser = async () => {
-    setLoadingUser(true)
     const token = localStorage.getItem('token')
     if (!token) {
       setUser(null)
-      setLoadingUser(false)
       return
     }
 
@@ -23,20 +26,26 @@ const NavBar = () => {
       const res = await axios.get('https://stud-bud-backend.onrender.com/me', {
         headers: { Authorization: `Bearer ${token}` },
       })
-      setUser(res.data.user)
+
+      if (res.data?.success && res.data.data?.user) {
+        setUser(res.data.data.user)
+      } else {
+        // Invalid or expired token → log out immediately
+        localStorage.removeItem('token')
+        setUser(null)
+      }
     } catch {
+      localStorage.removeItem('token')
       setUser(null)
-    } finally {
-      setLoadingUser(false)
     }
   }
 
+  // Fetch on mount and listen for storage changes across tabs
   useEffect(() => {
     fetchUser()
-
-    const handleStorageChange = () => fetchUser()
-    window.addEventListener('storage', handleStorageChange)
-    return () => window.removeEventListener('storage', handleStorageChange)
+    const handleStorage = () => fetchUser()
+    window.addEventListener('storage', handleStorage)
+    return () => window.removeEventListener('storage', handleStorage)
   }, [])
 
   const handleLogout = () => {
@@ -55,8 +64,7 @@ const NavBar = () => {
   const btnDanger = `${btnBase} bg-red-500 text-white shadow-md hover:bg-red-600 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0`
 
   const renderLinks = () => {
-    if (loadingUser) return null // Avoid flicker
-    if (user) {
+    if (user && user.id) {
       return (
         <>
           <Link
