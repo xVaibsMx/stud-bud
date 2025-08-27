@@ -1,8 +1,6 @@
-// server.js
 'use strict'
 
 require('dotenv').config()
-
 const express = require('express')
 const mongoose = require('mongoose')
 const jwt = require('jsonwebtoken')
@@ -122,7 +120,7 @@ app.post(
   '/register',
   [
     body('username').isString().trim().isLength({ min: 3, max: 40 }),
-    body('password').isString().isLength({ min: 6, max: 128 }),
+    body('password').isString().isLength({ min: 3, max: 128 }), // changed min to 3
   ],
   asyncHandler(async (req, res) => {
     const errors = validationResult(req)
@@ -158,7 +156,7 @@ app.post(
   '/login',
   [
     body('username').isString().trim().isLength({ min: 3, max: 40 }),
-    body('password').isString().isLength({ min: 6, max: 128 }),
+    body('password').isString().isLength({ min: 3, max: 128 }), // changed min to 3
   ],
   asyncHandler(async (req, res) => {
     const errors = validationResult(req)
@@ -187,10 +185,25 @@ app.post(
   })
 )
 
-/* ------------------ AI PART (UNCHANGED) ------------------ */
-const { GoogleGenAI } = require('@google/genai')
+/* ------------------ /me ROUTE ------------------ */
+app.get(
+  '/me',
+  isUserLogged,
+  asyncHandler(async (req, res) => {
+    // fetch user safely
+    const user = await Users.findById(req.user.id).select('username _id').lean()
+    if (!user) {
+      localStorage?.removeItem('token') // safe cleanup (frontend should handle)
+      return respond(res, 404, false, null, 'User not found')
+    }
 
-// Gemini AI helper (UNCHANGED)
+    const formattedUser = { username: user.username, id: user._id.toString() }
+    return respond(res, 200, true, { user: formattedUser }, 'User info')
+  })
+)
+
+/* ------------------ AI PART ------------------ */
+const { GoogleGenAI } = require('@google/genai')
 const getAIResponse = async (promptText) => {
   try {
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY })
@@ -236,18 +249,6 @@ aiRoutes.forEach(({ path, prefix }) => {
 /* ------------------ UTILITY ROUTES ------------------ */
 app.get('/', (req, res) => res.send('Stud-Bud backend is running ✅'))
 app.get('/test', (req, res) => res.send({ message: 'API is alive 🚀' }))
-
-app.get(
-  '/me',
-  isUserLogged,
-  asyncHandler(async (req, res) => {
-    const user = await Users.findById(req.user.id).select('username _id').lean()
-    if (!user) return respond(res, 404, false, null, 'User not found')
-
-    const formattedUser = { username: user.username, id: user._id.toString() }
-    return respond(res, 200, true, { user: formattedUser }, 'User info')
-  })
-)
 
 /* ------------------ ERROR HANDLER ------------------ */
 app.use((err, req, res, next) => {
