@@ -190,11 +190,10 @@ app.get(
   '/me',
   isUserLogged,
   asyncHandler(async (req, res) => {
-    // fetch user safely
     const user = await Users.findById(req.user.id).select('username _id').lean()
     if (!user) {
-      localStorage?.removeItem('token') // safe cleanup (frontend should handle)
-      return respond(res, 404, false, null, 'User not found')
+      // Token is valid but user no longer exists → treat as unauthorized
+      return respond(res, 401, false, null, 'Invalid or expired token')
     }
 
     const formattedUser = { username: user.username, id: user._id.toString() }

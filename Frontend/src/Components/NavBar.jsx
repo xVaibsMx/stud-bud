@@ -6,31 +6,25 @@ import { motion, AnimatePresence } from 'framer-motion'
 
 const NavBar = () => {
   const navigate = useNavigate()
-
-  // Initial state based on token presence
   const [user, setUser] = useState(() => {
     const token = localStorage.getItem('token')
-    return token ? {} : null // empty object shows "loading" until validated
+    return token ? {} : null // {} means loading
   })
   const [isOpen, setIsOpen] = useState(false)
 
-  // Fetch user from backend if token exists
   const fetchUser = async () => {
     const token = localStorage.getItem('token')
     if (!token) {
       setUser(null)
       return
     }
-
     try {
       const res = await axios.get('https://stud-bud-backend.onrender.com/me', {
         headers: { Authorization: `Bearer ${token}` },
       })
-
-      if (res.data?.success && res.data.data?.user) {
+      if (res.data.success && res.data.data.user) {
         setUser(res.data.data.user)
       } else {
-        // Invalid or expired token → log out immediately
         localStorage.removeItem('token')
         setUser(null)
       }
@@ -40,7 +34,6 @@ const NavBar = () => {
     }
   }
 
-  // Fetch on mount and listen for storage changes across tabs
   useEffect(() => {
     fetchUser()
     const handleStorage = () => fetchUser()
@@ -55,8 +48,6 @@ const NavBar = () => {
     window.dispatchEvent(new Event('storage'))
   }
 
-  const handleLinkClick = () => setIsOpen(false)
-
   const btnBase =
     'px-6 py-2.5 rounded-full font-[Poppins] font-semibold text-sm sm:text-base tracking-wide transition-all duration-300'
   const btnPrimary = `${btnBase} bg-teal-400 text-gray-900 shadow-md hover:bg-teal-500 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0`
@@ -65,13 +56,10 @@ const NavBar = () => {
 
   const renderLinks = () => {
     if (user && user.id) {
+      // logged in
       return (
         <>
-          <Link
-            to="/dashboard"
-            onClick={handleLinkClick}
-            className={btnOutline}
-          >
+          <Link to="/dashboard" className={btnOutline}>
             Dashboard
           </Link>
           <button onClick={handleLogout} className={btnDanger}>
@@ -79,28 +67,28 @@ const NavBar = () => {
           </button>
         </>
       )
-    } else {
+    } else if (user === null) {
+      // definitely logged out
       return (
         <>
-          <Link to="/register" onClick={handleLinkClick} className={btnOutline}>
+          <Link to="/register" className={btnOutline}>
             Register
           </Link>
-          <Link to="/login" onClick={handleLinkClick} className={btnPrimary}>
+          <Link to="/login" className={btnPrimary}>
             Login
           </Link>
         </>
       )
+    } else {
+      // loading → render nothing
+      return null
     }
   }
 
   return (
     <nav className="w-full max-w-7xl mx-auto sticky top-0 z-50 px-5 sm:px-8 py-3 sm:py-4 bg-[#0b1224]/95 backdrop-blur-md border-b border-white/5 shadow-lg rounded-b-2xl flex items-center justify-between">
       {/* Logo */}
-      <Link
-        to="/"
-        onClick={handleLinkClick}
-        className="flex items-center gap-3"
-      >
+      <Link to="/" className="flex items-center gap-3">
         <motion.div
           whileHover={{ rotate: 8, scale: 1.05 }}
           className="flex items-center justify-center w-11 h-11 rounded-xl bg-teal-400/10 border border-teal-400/40 shadow-md"
