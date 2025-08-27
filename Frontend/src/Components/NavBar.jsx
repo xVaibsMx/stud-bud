@@ -6,31 +6,38 @@ import { motion, AnimatePresence } from 'framer-motion'
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false)
-  const [user, setUser] = useState(undefined) // 👈 undefined until loaded
+  const [user, setUser] = useState(undefined) // undefined while loading
+  const [loadingUser, setLoadingUser] = useState(true)
   const navigate = useNavigate()
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const token = localStorage.getItem('token')
-        if (!token) return setUser(null)
-
-        const res = await axios.get(
-          'https://stud-bud-backend.onrender.com/me',
-          { headers: { Authorization: `Bearer ${token}` } }
-        )
-        setUser(res.data.user)
-      } catch {
-        setUser(null)
-      }
+  const fetchUser = async () => {
+    setLoadingUser(true)
+    const token = localStorage.getItem('token')
+    if (!token) {
+      setUser(null)
+      setLoadingUser(false)
+      return
     }
 
-    fetchUser()
-    window.addEventListener('storage', fetchUser)
-    return () => window.removeEventListener('storage', fetchUser)
-  }, [])
+    try {
+      const res = await axios.get('https://stud-bud-backend.onrender.com/me', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      setUser(res.data.user)
+    } catch {
+      setUser(null)
+    } finally {
+      setLoadingUser(false)
+    }
+  }
 
-  const handleLinkClick = () => setIsOpen(false)
+  useEffect(() => {
+    fetchUser()
+
+    const handleStorageChange = () => fetchUser()
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
+  }, [])
 
   const handleLogout = () => {
     localStorage.removeItem('token')
@@ -39,7 +46,8 @@ const NavBar = () => {
     window.dispatchEvent(new Event('storage'))
   }
 
-  // 🌟 Button styles
+  const handleLinkClick = () => setIsOpen(false)
+
   const btnBase =
     'px-6 py-2.5 rounded-full font-[Poppins] font-semibold text-sm sm:text-base tracking-wide transition-all duration-300'
   const btnPrimary = `${btnBase} bg-teal-400 text-gray-900 shadow-md hover:bg-teal-500 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0`
@@ -47,9 +55,7 @@ const NavBar = () => {
   const btnDanger = `${btnBase} bg-red-500 text-white shadow-md hover:bg-red-600 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0`
 
   const renderLinks = () => {
-    if (user === undefined) {
-      return null // ⏳ Avoid flicker while loading
-    }
+    if (loadingUser) return null // Avoid flicker
     if (user) {
       return (
         <>
@@ -80,7 +86,7 @@ const NavBar = () => {
   }
 
   return (
-    <nav className="w-full max-w-7xl mx-auto sticky top-0 z-50 px-5 sm:px-8 py-3 sm:py-4 bg-[#0b1224]/90 backdrop-blur-md border-b border-white/5 shadow-lg rounded-b-2xl flex items-center justify-between">
+    <nav className="w-full max-w-7xl mx-auto sticky top-0 z-50 px-5 sm:px-8 py-3 sm:py-4 bg-[#0b1224]/95 backdrop-blur-md border-b border-white/5 shadow-lg rounded-b-2xl flex items-center justify-between">
       {/* Logo */}
       <Link
         to="/"
@@ -98,7 +104,7 @@ const NavBar = () => {
         </span>
       </Link>
 
-      {/* Desktop Menu */}
+      {/* Desktop Links */}
       <div className="hidden sm:flex space-x-5 md:space-x-7">
         {renderLinks()}
       </div>
