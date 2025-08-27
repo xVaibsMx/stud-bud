@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import { BookOpen } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false)
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState(undefined) // 👈 undefined until loaded
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -15,27 +17,17 @@ const NavBar = () => {
 
         const res = await axios.get(
           'https://stud-bud-backend.onrender.com/me',
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+          { headers: { Authorization: `Bearer ${token}` } }
         )
         setUser(res.data.user)
-      } catch (err) {
-        console.log('User not logged in')
+      } catch {
         setUser(null)
       }
     }
 
     fetchUser()
-
-    // 🔁 Listen for login/logout token updates
     window.addEventListener('storage', fetchUser)
-
-    return () => {
-      window.removeEventListener('storage', fetchUser)
-    }
+    return () => window.removeEventListener('storage', fetchUser)
   }, [])
 
   const handleLinkClick = () => setIsOpen(false)
@@ -44,26 +36,31 @@ const NavBar = () => {
     localStorage.removeItem('token')
     setUser(null)
     navigate('/login')
-
-    // 📢 Notify other components about logout
     window.dispatchEvent(new Event('storage'))
   }
 
+  // 🌟 Button styles
+  const btnBase =
+    'px-6 py-2.5 rounded-full font-[Poppins] font-semibold text-sm sm:text-base tracking-wide transition-all duration-300'
+  const btnPrimary = `${btnBase} bg-teal-400 text-gray-900 shadow-md hover:bg-teal-500 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0`
+  const btnOutline = `${btnBase} border border-teal-400 text-teal-400 hover:bg-teal-400 hover:text-gray-900 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0`
+  const btnDanger = `${btnBase} bg-red-500 text-white shadow-md hover:bg-red-600 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0`
+
   const renderLinks = () => {
+    if (user === undefined) {
+      return null // ⏳ Avoid flicker while loading
+    }
     if (user) {
       return (
         <>
           <Link
             to="/dashboard"
             onClick={handleLinkClick}
-            className="text-teal-400 border border-teal-400 px-5 py-2 rounded-full font-semibold hover:bg-teal-400 hover:text-gray-900 transition"
+            className={btnOutline}
           >
             Dashboard
           </Link>
-          <button
-            onClick={handleLogout}
-            className="bg-red-500 px-5 py-2 rounded-full font-semibold text-white hover:bg-red-600 transition"
-          >
+          <button onClick={handleLogout} className={btnDanger}>
             Logout
           </button>
         </>
@@ -71,18 +68,10 @@ const NavBar = () => {
     } else {
       return (
         <>
-          <Link
-            to="/register"
-            onClick={handleLinkClick}
-            className="text-teal-400 border border-teal-400 px-5 py-2 rounded-full font-semibold hover:bg-teal-400 hover:text-gray-900 transition"
-          >
+          <Link to="/register" onClick={handleLinkClick} className={btnOutline}>
             Register
           </Link>
-          <Link
-            to="/login"
-            onClick={handleLinkClick}
-            className="bg-teal-400 px-5 py-2 rounded-full font-semibold text-gray-900 hover:bg-teal-500 transition"
-          >
+          <Link to="/login" onClick={handleLinkClick} className={btnPrimary}>
             Login
           </Link>
         </>
@@ -91,15 +80,28 @@ const NavBar = () => {
   }
 
   return (
-    <nav className="w-full max-w-6xl mx-auto sticky top-0 bg-[#15203d]/90 backdrop-blur-sm z-50 rounded-b-xl px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-      <Link to="/">
-        <h1 className="text-teal-400 font-extrabold text-2xl select-none">
-          Stud-Bud
-        </h1>
+    <nav className="w-full max-w-7xl mx-auto sticky top-0 z-50 px-5 sm:px-8 py-3 sm:py-4 bg-[#0b1224]/90 backdrop-blur-md border-b border-white/5 shadow-lg rounded-b-2xl flex items-center justify-between">
+      {/* Logo */}
+      <Link
+        to="/"
+        onClick={handleLinkClick}
+        className="flex items-center gap-3"
+      >
+        <motion.div
+          whileHover={{ rotate: 8, scale: 1.05 }}
+          className="flex items-center justify-center w-11 h-11 rounded-xl bg-teal-400/10 border border-teal-400/40 shadow-md"
+        >
+          <BookOpen className="w-6 h-6 text-teal-400" />
+        </motion.div>
+        <span className="font-[Anton] text-2xl sm:text-3xl tracking-wide text-slate-100">
+          STUD<span className="text-teal-400">BUD</span>
+        </span>
       </Link>
 
-      {/* Desktop Links */}
-      <div className="hidden sm:flex space-x-6">{renderLinks()}</div>
+      {/* Desktop Menu */}
+      <div className="hidden sm:flex space-x-5 md:space-x-7">
+        {renderLinks()}
+      </div>
 
       {/* Mobile Toggle */}
       <button
@@ -133,47 +135,19 @@ const NavBar = () => {
       </button>
 
       {/* Mobile Menu */}
-      {isOpen && (
-        <div className="sm:hidden absolute top-full left-0 w-full max-w-6xl bg-[#15203d]/90 backdrop-blur-sm rounded-b-xl shadow-lg mt-1 px-6 py-5 z-40 flex flex-col space-y-4">
-          {user ? (
-            <>
-              <Link
-                to="/dashboard"
-                onClick={handleLinkClick}
-                className="text-teal-400 border border-teal-400 px-6 py-3 rounded-full font-semibold text-center hover:bg-teal-400 hover:text-gray-900 transition"
-              >
-                Dashboard
-              </Link>
-              <button
-                onClick={() => {
-                  handleLogout()
-                  handleLinkClick()
-                }}
-                className="bg-red-500 px-6 py-3 rounded-full font-semibold text-white text-center hover:bg-red-600 transition"
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            <>
-              <Link
-                to="/register"
-                onClick={handleLinkClick}
-                className="text-teal-400 border border-teal-400 px-6 py-3 rounded-full font-semibold text-center hover:bg-teal-400 hover:text-gray-900 transition"
-              >
-                Register
-              </Link>
-              <Link
-                to="/login"
-                onClick={handleLinkClick}
-                className="bg-teal-400 px-6 py-3 rounded-full font-semibold text-gray-900 text-center hover:bg-teal-500 transition"
-              >
-                Login
-              </Link>
-            </>
-          )}
-        </div>
-      )}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.25 }}
+            className="sm:hidden absolute top-full left-0 w-full bg-[#0b1224]/95 backdrop-blur-md border-t border-white/10 rounded-b-2xl shadow-xl mt-1 px-6 py-6 flex flex-col space-y-5 z-40"
+          >
+            {renderLinks()}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   )
 }
