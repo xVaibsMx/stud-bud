@@ -120,7 +120,7 @@ app.post(
   '/register',
   [
     body('username').isString().trim().isLength({ min: 3, max: 40 }),
-    body('password').isString().isLength({ min: 3, max: 128 }), // changed min to 3
+    body('password').isString().isLength({ min: 3, max: 128 }),
   ],
   asyncHandler(async (req, res) => {
     const errors = validationResult(req)
@@ -156,7 +156,7 @@ app.post(
   '/login',
   [
     body('username').isString().trim().isLength({ min: 3, max: 40 }),
-    body('password').isString().isLength({ min: 3, max: 128 }), // changed min to 3
+    body('password').isString().isLength({ min: 3, max: 128 }),
   ],
   asyncHandler(async (req, res) => {
     const errors = validationResult(req)
@@ -192,7 +192,6 @@ app.get(
   asyncHandler(async (req, res) => {
     const user = await Users.findById(req.user.id).select('username _id').lean()
     if (!user) {
-      // Token is valid but user no longer exists → treat as unauthorized
       return respond(res, 401, false, null, 'Invalid or expired token')
     }
 
@@ -248,6 +247,9 @@ aiRoutes.forEach(({ path, prefix }) => {
 /* ------------------ UTILITY ROUTES ------------------ */
 app.get('/', (req, res) => res.send('Stud-Bud backend is running ✅'))
 app.get('/test', (req, res) => res.send({ message: 'API is alive 🚀' }))
+app.get('/health', (req, res) =>
+  res.status(200).json({ success: true, message: 'Backend is healthy ✅' })
+)
 
 /* ------------------ ERROR HANDLER ------------------ */
 app.use((err, req, res, next) => {

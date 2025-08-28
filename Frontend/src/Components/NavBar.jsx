@@ -6,10 +6,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 
 const NavBar = () => {
   const navigate = useNavigate()
-  const [user, setUser] = useState(() => {
-    const token = localStorage.getItem('token')
-    return token ? {} : null // {} means loading
-  })
+  // undefined = loading, null = logged out, object = logged in
+  const [user, setUser] = useState(undefined)
   const [isOpen, setIsOpen] = useState(false)
 
   const fetchUser = async () => {
@@ -28,7 +26,8 @@ const NavBar = () => {
         localStorage.removeItem('token')
         setUser(null)
       }
-    } catch {
+    } catch (err) {
+      console.error('fetchUser failed:', err)
       localStorage.removeItem('token')
       setUser(null)
     }
@@ -36,16 +35,24 @@ const NavBar = () => {
 
   useEffect(() => {
     fetchUser()
+
+    // Listen to both storage (cross-tab) and custom login event
     const handleStorage = () => fetchUser()
     window.addEventListener('storage', handleStorage)
-    return () => window.removeEventListener('storage', handleStorage)
+    window.addEventListener('auth-changed', handleStorage)
+
+    return () => {
+      window.removeEventListener('storage', handleStorage)
+      window.removeEventListener('auth-changed', handleStorage)
+    }
   }, [])
 
   const handleLogout = () => {
     localStorage.removeItem('token')
     setUser(null)
     navigate('/login')
-    window.dispatchEvent(new Event('storage'))
+    // trigger update in all tabs
+    window.dispatchEvent(new Event('auth-changed'))
   }
 
   const btnBase =
@@ -55,6 +62,10 @@ const NavBar = () => {
   const btnDanger = `${btnBase} bg-red-500 text-white shadow-md hover:bg-red-600 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0`
 
   const renderLinks = () => {
+    if (user === undefined) {
+      // loading
+      return null
+    }
     if (user && user.id) {
       // logged in
       return (
@@ -67,22 +78,18 @@ const NavBar = () => {
           </button>
         </>
       )
-    } else if (user === null) {
-      // definitely logged out
-      return (
-        <>
-          <Link to="/register" className={btnOutline}>
-            Register
-          </Link>
-          <Link to="/login" className={btnPrimary}>
-            Login
-          </Link>
-        </>
-      )
-    } else {
-      // loading → render nothing
-      return null
     }
+    // logged out
+    return (
+      <>
+        <Link to="/register" className={btnOutline}>
+          Register
+        </Link>
+        <Link to="/login" className={btnPrimary}>
+          Login
+        </Link>
+      </>
+    )
   }
 
   return (

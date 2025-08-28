@@ -7,7 +7,7 @@ const Login = () => {
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
-  // Use Vite environment variable here
+  // Use Vite env variable (fallback to localhost for dev)
   const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'
 
   const handleSubmit = async (e) => {
@@ -28,11 +28,12 @@ const Login = () => {
         return
       }
 
+      // Store JWT token
       localStorage.setItem('token', data.token)
-      window.dispatchEvent(new Event('storage')) // notify NavBar to update
+      window.dispatchEvent(new Event('storage')) // tell NavBar about login
       navigate('/dashboard')
     } catch (err) {
-      setError('Server not responding. Please try again later.')
+      setError('⚠️ Server not responding. Please try again later.')
     }
   }
 
@@ -40,10 +41,10 @@ const Login = () => {
     <div className="flex justify-center items-start px-4 py-20 bg-slate-900 min-h-[calc(100vh-64px)]">
       <form
         onSubmit={handleSubmit}
-        className="bg-[#1e293b] w-full max-w-md p-8 rounded-xl shadow-lg"
+        className="bg-[#1e293b] w-full max-w-md p-8 rounded-xl shadow-xl border border-slate-700"
       >
-        <h2 className="text-3xl font-semibold mb-6 text-teal-400 text-center">
-          Login to Your Account
+        <h2 className="text-3xl font-bold mb-6 text-teal-400 text-center">
+          Welcome Back 👋
         </h2>
 
         {error && (
@@ -59,7 +60,7 @@ const Login = () => {
             id="username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="w-full p-3 rounded-md border border-gray-600 bg-[#15212b] text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-400"
+            className="w-full p-3 rounded-md border border-gray-600 bg-[#15212b] text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-400 transition"
             placeholder="Enter your username"
             required
           />
@@ -74,7 +75,7 @@ const Login = () => {
             id="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-3 rounded-md border border-gray-600 bg-[#15212b] text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-400"
+            className="w-full p-3 rounded-md border border-gray-600 bg-[#15212b] text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-400 transition"
             placeholder="Enter your password"
             required
           />
@@ -82,7 +83,7 @@ const Login = () => {
 
         <button
           type="submit"
-          className="w-full py-3 bg-teal-400 text-gray-900 font-semibold rounded-full hover:bg-teal-500 transition duration-300"
+          className="w-full py-3 bg-teal-400 text-gray-900 font-semibold rounded-full hover:bg-teal-500 active:scale-[0.98] transition duration-300 shadow-md"
         >
           Login
         </button>
